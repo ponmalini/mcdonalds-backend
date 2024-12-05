@@ -20,7 +20,9 @@ mongoose.connect(dbUri, {
 
 // Routes
 const userRoutes = require('./routes/userRoutes');
-app.use('/', userRoutes);
+app.use('/register/', userRoutes);
+const productRoutes = require('./routes/productRoutes');
+app.use('/product/', productRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

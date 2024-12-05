@@ -6,7 +6,7 @@ const User = require('../models/user');
 
 
 router.post('/SignUp', async (req, res) => {
-    const { name, email,mobileNumber } = req.body;
+    const { name, email, mobileNumber } = req.body;
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ mobileNumber });
@@ -15,16 +15,50 @@ router.post('/SignUp', async (req, res) => {
         }
 
         // Create and save user (schema middleware will hash the password)
-        const newUser = new User({ name, email,mobileNumber });
+        const newUser = new User({ name, email, mobileNumber });
         await newUser.save();
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        if (error.code === 11000) { 
+        if (error.code === 11000) {
             return res.status(400).json({ message: 'Mobile Number already in use' });
         }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
+//Login Route
+router.post('/login', async (req, res) => {
+    const { mobileNumber } = req.body;
+    try {
+        // Find user by email
+        const user = await User.findOne({ mobileNumber });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+        );
+
+        res.status(200).json({ message: 'Login successful', token });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+
+
 module.exports = router;
+
+
+
+
+
+
+
+
+
