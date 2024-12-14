@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const multer = require('multer');
 
 dotenv.config();
 
@@ -15,14 +16,38 @@ mongoose.connect(dbUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-.then(() => console.log('Database connected'))
-.catch(error => console.error('Database connection error:', error));
+    .then(() => console.log('Database connected'))
+    .catch(error => console.error('Database connection error:', error));
+
+// Default options, no immediate file access
+//app.use(fileUpload());
+
 
 // Routes
 const userRoutes = require('./routes/userRoutes');
-app.use('/register/', userRoutes);
+app.use('/account/', userRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/product/', productRoutes);
+
+const upload = multer({ dest: 'public/uploads/' }).single('file');
+app.post("/upload", upload, async (req, res) => {
+    try {    
+      if (req.file) {
+        console.log(req);
+        res.send({
+          status: true,
+          message: "File Uploaded!",
+        });
+      } else {
+        res.status(400).send({
+          status: false,
+          data: "File Not Found :(",
+        });
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
