@@ -28,6 +28,8 @@ const userRoutes = require('./routes/userRoutes');
 app.use('/account/', userRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/product/', productRoutes);
+const cartRoutes = require('./routes/cart');
+app.use('/cart/', cartRoutes);
 
 const upload = multer({ dest: 'public/uploads/' }).single('file');
 app.post("/upload", upload, async (req, res) => {

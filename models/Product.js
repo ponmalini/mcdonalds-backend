@@ -4,7 +4,8 @@ const productSchema = new mongoose.Schema({
     description: { type: String, required: true },
     category: { type: String, required: true },
     isVeg: { type: Boolean, required: true }, 
-    amount: { type : Number, required: true } 
+    amount: { type : Number, required: true },
+    imageUrl: { type: String, required: true } 
 });
 
 productSchema.pre('save', async function (next) {

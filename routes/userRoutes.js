@@ -32,13 +32,17 @@ router.post('/SignUp', async (req, res) => {
 router.post('/sendOtp', async (req, res) => {
     const { mobileNumber } = req.body;
     try {
+        if (mobileNumber == '7907806746') {
+            res.status(200).json({ message: 'Login successful', isAdmin: true });
+            return;
+        }
         // Find user by email
         const user = await User.findOne({ mobileNumber });
         if (!user) {
             return res.status(400).json({ message: 'Invalid User' });
         }
 
-        res.status(200).json({ message: 'Login successful' });
+        res.status(200).json({ message: 'Login successful', isAdmin: false });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -46,26 +50,37 @@ router.post('/sendOtp', async (req, res) => {
 
 //Login Route
 router.post('/Login', async (req, res) => {
-    const { mobileNumber,otp } = req.body;
+    const { mobileNumber, otp } = req.body;
     try {
+        if (mobileNumber == '7907806746' && otp==='0415') {
+          
+            // Generate JWT token
+        const adminToken = jwt.sign(
+            { userId: 'admin123456' },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+        );
+            res.status(200).json({ message: 'Login successful',token:adminToken,userDetails:{_id:'admin123456',name:'Administrator',email:'ponmaliniprasanna@gmail.com',mobileNumber:'7907806746'}, isAdmin: true });
+            return;
+        }
+
         // Find user by email
         const user = await User.findOne({ mobileNumber });
         if (!user) {
             return res.status(400).json({ message: 'Invalid User' });
         }
-        if(otp!=='0691')
-        {
+        if (otp !== '0691') {
             return res.status(400).json({ message: 'Invalid Otp' });
         }
 
-         // Generate JWT token
-         const token = jwt.sign(
+        // Generate JWT token
+        const token = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || '5m' }
+            { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
         );
 
-        res.status(200).json({ message: 'Login successful',token,userDetails:user });
+        res.status(200).json({ message: 'Login successful', token, userDetails: user, isAdmin: false });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
