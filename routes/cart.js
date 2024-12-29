@@ -5,10 +5,10 @@ require('dotenv').config();
 const Cart = require('../models/Cart');
 
 router.post('/addCart', async (req, res) => {
-    const { productName,mobileNumber,amount,quantity,imageUrl } = req.body;
+    const { productName, mobileNumber, amount, quantity, imageUrl,orderConfirmed } = req.body;
 
     try {
-        const newCart = new Cart({  productName,mobileNumber,amount,quantity,imageUrl });
+        const newCart = new Cart({ productName, mobileNumber, amount, quantity, imageUrl,orderConfirmed });
         await newCart.save();
 
         res.status(201).json({ message: 'Cart registered successfully!' });
@@ -27,7 +27,27 @@ router.get('/getCart/:mobileNumber', async (req, res) => {
     try {
         const mobileNumber = req.params.mobileNumber;
         const cart = await Cart.find();
-        res.status(200).json(cart.filter(e=>e.mobileNumber==mobileNumber));
+        res.status(200).json(cart.filter(e => e.mobileNumber == mobileNumber && e.orderConfirmed==false));
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.put('/confirmOrder/:mobileNumber', async (req, res) => {
+    try {
+        const mobileNumber = req.params.mobileNumber;
+        const cart = await Cart.updateMany({'mobileNumber':mobileNumber},{$set:{orderConfirmed: true}});
+        res.status(200).json({'success':'Ok'});
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/getOrderData/:mobileNumber', async (req, res) => {
+    try {
+        const mobileNumber = req.params.mobileNumber;
+        const cart = await Cart.find();
+        res.status(200).json(cart.filter(e => e.mobileNumber == mobileNumber && e.orderConfirmed==true));
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -52,7 +72,7 @@ router.delete('/deleteCartByMobileNumber/:mobileNumber', async (req, res) => {
     const { mobileNumber } = req.params;
 
     try {
-        const deleteCart = await Cart.deleteMany({mobileNumber});
+        const deleteCart = await Cart.deleteMany({ mobileNumber });
         if (!deleteCart) {
             return res.status(404).json({ message: 'Cart not found' });
         }
@@ -62,5 +82,9 @@ router.delete('/deleteCartByMobileNumber/:mobileNumber', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
+
+
+
+
 
 module.exports = router;

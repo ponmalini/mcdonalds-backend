@@ -4,7 +4,8 @@ const cartSchema = new mongoose.Schema({
     mobileNumber: { type: String, required: true },
     amount: { type : Number, required: true },
     quantity: { type: String, required: true },
-    imageUrl: { type: String, required: true } 
+    imageUrl: { type: String, required: true }, 
+    orderConfirmed: { type: Boolean, required: true }
 });
 
 cartSchema.pre('save', async function (next) {

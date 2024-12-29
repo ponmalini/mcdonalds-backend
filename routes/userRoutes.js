@@ -7,7 +7,7 @@ const User = require('../models/user');
 
 
 router.post('/SignUp', async (req, res) => {
-    const { name, email, mobileNumber } = req.body;
+    const { name, email, mobileNumber,address } = req.body;
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ mobileNumber });
@@ -16,7 +16,7 @@ router.post('/SignUp', async (req, res) => {
         }
 
         // Create and save user (schema middleware will hash the password)
-        const newUser = new User({ name, email, mobileNumber });
+        const newUser = new User({ name, email, mobileNumber,address });
         await newUser.save();
 
         res.status(201).json({ message: 'User registered successfully' });

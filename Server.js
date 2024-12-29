@@ -51,6 +51,15 @@ app.post("/upload", upload, async (req, res) => {
     }
   });
 
+  app.post("/submit-delivery", (req, res) => {
+    const deliveryDetails = req.body;
+    console.log("Received delivery details:", deliveryDetails);
+  
+    // Example: Save to database or process data here
+    res.status(200).json({ message: "Delivery details submitted successfully", deliveryDetails });
+  });
+  
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
